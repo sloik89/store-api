@@ -1,10 +1,28 @@
 const Products = require("../models/products");
 const getAllProductsStatic = async (req, res) => {
-  throw new Error("test error");
-  res.status(200).json({ msg: "get all products static" });
+  const products = await Products.find({}).sort("price");
+  res.status(200).json({ products });
 };
 const getAllProducts = async (req, res) => {
-  res.status(200).json({ msg: "get all products" });
+  const { featured, company, name, sort } = req.query;
+  const queryObject = {};
+  if (featured) {
+    queryObject.featured = featured === "true" ? true : false;
+  }
+  if (company) {
+    queryObject.company = company;
+  }
+  if (name) {
+    // use query operators in mongo db
+    queryObject.name = { $regex: name, $options: "i" };
+  }
+  let result = Products.find(queryObject);
+  if (sort) {
+    const sortList = sort.split(",").join(" ");
+    result = result.sort(sortList);
+  }
+  const products = await result;
+  res.status(200).json({ products, numberOfHits: products.length });
 };
 module.exports = {
   getAllProductsStatic,
