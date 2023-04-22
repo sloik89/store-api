@@ -1,3 +1,4 @@
+const Products = require("../models/products");
 const getAllProductsStatic = async (req, res) => {
   throw new Error("test error");
   res.status(200).json({ msg: "get all products static" });
